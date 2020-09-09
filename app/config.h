@@ -23,17 +23,21 @@ Token is word separate by white space, for example 3 token line:
 "IRin> set mode test" */
 #define _COMMAND_TOKEN_NMB 8
 
+#define __USER_PROMPT_DEFAULT ">"
+
+#define __USER_PROMPT_SUFIX " "
+
 /*
 Define you prompt string here. You can use colors escape code, for highlight you prompt,
 for example this prompt will green color (if you terminal supports color)*/
 //#define _PROMPT_DEFAULT "\033[32m>\033[0m "	// green color
 //#define _PROMPT_DEFAULT "\033[32m>\033[0m "	// green color
-#define _PROMPT_DEFAULT "> "
+#define _PROMPT_DEFAULT  "\033[32m" __USER_PROMPT_DEFAULT "\033[0m" __USER_PROMPT_SUFIX
 
 /*
 Define prompt text (without ESC sequence, only text) prompt length, it needs because if you use
 ESC sequence, it's not possible detect only text length*/
-#define _PROMPT_LEN       (int)strlen(_PROMPT_DEFAULT)
+#define _PROMPT_LEN       (int)strlen(__USER_PROMPT_DEFAULT __USER_PROMPT_SUFIX)
 
 /*Define it, if you wanna use completion functional, also set completion callback in you code,
 now if user press TAB calls 'copmlitetion' callback. If you no need it, you can just set 

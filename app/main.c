@@ -17,6 +17,9 @@ char              inputchar;
 RINGBUFF_T rbuff;
 uint8_t    inputBuff[512];
 
+microrl_t  rl;
+microrl_t* prl = &rl;
+
 //*****************************************************************************
 // print callback for microrl library
 void print(const char* str) {
@@ -34,6 +37,31 @@ char get_char(void) {
     return c;
 }
 
+char* welcome =
+		"               __                                             \n"
+		"              |  \\                                            \n"
+		"     ______  _| $$_     ______    ______   ______ ____        \n"
+		"    /      \\|   $$ \\   /      \\  /      \\ |      \\    \\       \n"
+		"   |  $$$$$$\\\\$$$$$$  |  $$$$$$\\|  $$$$$$\\| $$$$$$\\$$$$\\      \n"
+		"   | $$    $$ | $$ __ | $$    $$| $$   \\$$| $$ | $$ | $$      \n"
+		"   | $$$$$$$$ | $$|  \\| $$$$$$$$| $$      | $$ | $$ | $$      \n"
+		"    \\$$     \\  \\$$  $$ \\$$     \\| $$      | $$ | $$ | $$      \n"
+		"     \\$$$$$$$   \\$$$$   \\$$$$$$$ \\$$       \\$$  \\$$  \\$$      \n"
+		"\n"
+		"\n"
+		"   Embedded Terminal RTOS 1.0 (c) 2014-2020       https/www.ericsonj.net\n"
+		"\n"
+		"[?]              Gives the list of available commands\n"
+		"command [?]      Gives help on the command and list of arguments\n"
+		"\n"
+		"[Tab]            Complete de command/word.\n"
+		"";
+
+static void term_accept(Connection* conn) {
+	TCPServer_write(conn, (uint8_t*)welcome, strlen(welcome));
+	print (prl->prompt_str);
+}
+
 static AppState term_recv(Connection* conn, uint8_t* data, uint32_t nbrOfBytes) {
     for (int i = 0; i < nbrOfBytes; ++i) {
         printf("%c\n", (char)data[i]);
@@ -45,9 +73,6 @@ static AppState term_recv(Connection* conn, uint8_t* data, uint32_t nbrOfBytes) 
 static void term_close(uint8_t connIdx) {
     printf("Close\n");
 }
-
-microrl_t  rl;
-microrl_t* prl = &rl;
 
 void term_task(void* args) {
 
@@ -79,6 +104,7 @@ int main(int argc, char* argv[]) {
     TCPApplication app;
     app.cli.closedCallback = term_close;
     app.cli.recvCallback   = term_recv;
+    app.cli.acceptCallback = term_accept;
     app.maxOfConns         = 1;
     app.poolOfConns        = &conn;
     app.port               = 8022;
